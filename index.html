@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CertoDeals - High-end deals met grote kortingen</title>
+  <style>
+    :root {
+      --royal-blue: #003da5;
+      --royal-blue-dark: #002f7f;
+      --accent: #ff5b2e;
+      --bg: #f5f7fb;
+      --text: #1d2433;
+      --muted: #6d778b;
+      --card: #ffffff;
+      --ok: #0d8f44;
+      --warn: #c67b00;
+      --bad: #be2a2a;
+      --shadow: 0 8px 24px rgba(16, 30, 54, 0.08);
+      --radius: 12px;
+      --transition: 220ms ease;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .container { width: min(1240px, 94vw); margin: 0 auto; }
+    .promo-strip {
+      background: #0c0d11;
+      color: #f4f6ff;
+      font-size: 0.84rem;
+      border-bottom: 1px solid #1c2231;
+    }
+    .promo-strip .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 36px;
+    }
+    .promo-strip a {
+      color: #f4f6ff;
+      text-decoration: underline;
+      opacity: 0.95;
+      white-space: nowrap;
+    }
+    .trust-strip {
+      background: #fff;
+      border-bottom: 1px solid #e4ecfb;
+    }
+    .trust-strip .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 38px;
+      flex-wrap: wrap;
+      padding: 0 0 2px;
+    }
+    .trust-item {
+      color: #1f3a76;
+      font-size: 0.83rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid #dce2ef;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    .topbar-inner {
+      display: grid;
+      grid-template-columns: 220px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 0;
+    }
+    .logo {
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: var(--royal-blue);
+      letter-spacing: 0.3px;
+      cursor: pointer;
+    }
+    .logo span { color: var(--accent); }
+    .search-wrap { position: relative; }
+    .search-wrap input {
+      width: 100%;
+      border: 1px solid #cbd6eb;
+      border-radius: 999px;
+      padding: 12px 18px;
+      outline: none;
+      background: #f9fbff;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .search-wrap input:focus {
+      border-color: var(--royal-blue);
+      box-shadow: 0 0 0 3px rgba(0, 61, 165, 0.14);
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .icon-btn, .login-btn, .primary-btn, .ghost-btn, .danger-btn {
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform var(--transition), background var(--transition), opacity var(--transition);
+    }
+    .icon-btn {
+      position: relative;
+      background: #eff4ff;
+      color: var(--royal-blue);
+      border: 1px solid #d6e3fc;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+    .icon-btn:hover, .login-btn:hover, .primary-btn:hover, .ghost-btn:hover, .danger-btn:hover {
+      transform: translateY(-1px);
+    }
+    .counter {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--accent);
+      color: #fff;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0 5px;
+    }
+    .login-btn {
+      background: var(--royal-blue);
+      color: #fff;
+      padding: 10px 14px;
+      font-weight: 600;
+    }
+    .user-chip {
+      display: none;
+      background: #eef4ff;
+      color: var(--royal-blue-dark);
+      border: 1px solid #d6e3fc;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      max-width: 260px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .nav-row {
+      background: var(--royal-blue);
+      color: #fff;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    }
+    .nav-inner {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      min-height: 52px;
+    }
+    .nav-item {
+      position: relative;
+      padding: 16px 18px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .menu-nav-item { font-weight: 800; }
+    .menu-nav-item .dropdown { min-width: 360px; }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .menu-title {
+      font-size: 0.83rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 800;
+      color: #6c7ea5;
+      margin: 12px 14px 6px;
+    }
+    .nav-item:hover { background: rgba(255, 255, 255, 0.13); }
+    .dropdown {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      min-width: 280px;
+      background: #fff;
+      color: var(--text);
+      border-radius: 0 0 10px 10px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      z-index: 50;
+      border: 1px solid #dce2ef;
+      border-top: 0;
+    }
+    .nav-item:hover .dropdown { display: block; }
+    .dropdown a {
+      display: block;
+      padding: 12px 14px;
+      font-size: 0.96rem;
+      border-bottom: 1px solid #eef1f7;
+    }
+    .dropdown a:hover {
+      background: #f4f8ff;
+      color: var(--royal-blue);
+    }
+
+    main {
+      min-height: 70vh;
+      padding: 24px 0 34px;
+    }
+    .page {
+      opacity: 0;
+      transform: translateY(8px);
+      animation: in var(--transition) forwards;
+    }
+    @keyframes in {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--royal-blue), #2b65d7);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 30px 26px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+    .hero h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 4vw, 2.5rem); }
+    .hero p { margin: 0; max-width: 800px; color: #d7e6ff; }
+    .hero-kpis {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .hero-kpis span {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .card, .info-card, .form-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid #e7edf8;
+    }
+    .section-title {
+      margin: 26px 0 12px;
+      font-size: 1.28rem;
+      color: #202c45;
+    }
+
+    .cat-grid, .subcat-grid, .product-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .cat-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .subcat-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .product-grid { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+
+    .cat-card, .subcat-card {
+      padding: 18px;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .cat-card:hover, .subcat-card:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(16,30,54,0.1); }
+    .cat-card h3, .subcat-card h3 { margin: 0 0 8px; color: var(--royal-blue); }
+    .cat-card p, .subcat-card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 12px;
+      padding: 14px;
+      margin-bottom: 18px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #ffffff, #f8fbff);
+    }
+    .filters.sticky {
+      position: sticky;
+      top: 108px;
+      z-index: 16;
+      box-shadow: 0 10px 22px rgba(16, 30, 54, 0.09);
+    }
+    .filter-group {
+      background: #fff;
+      border: 1px solid #dbe6fb;
+      border-radius: 10px;
+      padding: 10px 10px 8px;
+      box-shadow: 0 2px 8px rgba(10, 35, 95, 0.05);
+    }
+    .filters label {
+      display: block;
+      margin-bottom: 7px;
+      color: #5a6f9a;
+      font-size: 0.79rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .filters input, .filters select {
+      width: 100%;
+      border: 1px solid #cfdcf4;
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: #fdfefe;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .filters input:focus, .filters select:focus {
+      border-color: var(--royal-blue);
+      box-shadow: 0 0 0 3px rgba(0, 61, 165, 0.14);
+      outline: none;
+    }
+    .range-inline { display: flex; align-items: center; gap: 10px; }
+    .range-inline span { font-size: 0.84rem; color: #4f6594; min-width: 84px; font-weight: 700; }
+    .range-inline input[type="range"] {
+      accent-color: var(--royal-blue);
+    }
+
+    .product-card {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .product-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 28px rgba(16, 30, 54, 0.14);
+    }
+    .product-card img {
+      width: 100%;
+      height: 165px;
+      object-fit: cover;
+      border-bottom: 1px solid #edf1f8;
+      background: #f6f8fd;
+    }
+    .product-content { padding: 12px; display: grid; gap: 8px; }
+    .product-title {
+      font-size: 1rem;
+      margin: 0;
+      line-height: 1.35;
+      min-height: 44px;
+      cursor: pointer;
+    }
+    .product-title:hover { color: var(--royal-blue); }
+    .short {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      min-height: 36px;
+    }
+    .price-line { display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+    .old-price { text-decoration: line-through; color: #8d98ac; font-size: 0.9rem; }
+    .new-price { color: var(--royal-blue); font-size: 1.08rem; font-weight: 800; }
+    .badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #eb3823;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      border-radius: 999px;
+      padding: 5px 8px;
+    }
+    .heart {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #d9e2f2;
+      border-radius: 999px;
+      width: 34px;
+      height: 34px;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #8f96a8;
+    }
+    .heart.active { color: #e82f67; }
+    .stock { font-size: 0.85rem; font-weight: 700; }
+    .stock.ok { color: var(--ok); }
+    .stock.warn { color: var(--warn); }
+    .stock.bad { color: var(--bad); }
+    .actions-inline { display: flex; gap: 8px; }
+    .primary-btn {
+      background: var(--royal-blue);
+      color: #fff;
+      padding: 10px 12px;
+      font-weight: 700;
+      border-radius: 8px;
+      width: 100%;
+    }
+    .ghost-btn {
+      background: #edf3ff;
+      color: var(--royal-blue);
+      padding: 10px 12px;
+      font-weight: 700;
+      border-radius: 8px;
+      border: 1px solid #d7e2f7;
+      width: 100%;
+    }
+    .danger-btn {
+      background: #ffecef;
+      color: #c03758;
+      padding: 10px 12px;
+      font-weight: 700;
+      border: 1px solid #ffd1dd;
+      width: 100%;
+    }
+
+    .product-detail {
+      display: grid;
+      grid-template-columns: minmax(280px, 420px) 1fr;
+      gap: 18px;
+      padding: 18px;
+    }
+    .product-detail img {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #e7edf8;
+      background: #f6f8fd;
+    }
+    .specs {
+      background: #f8faff;
+      border: 1px solid #dde7f8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      color: #3f4b63;
+      white-space: pre-line;
+    }
+
+    .product-detail.pd-main { border: 0; box-shadow: none; background: transparent; padding: 18px; }
+    .pd-buy h1 { margin: 0 0 10px; font-size: clamp(1.25rem, 2.5vw, 1.65rem); line-height: 1.25; color: #0f172a; }
+    .pd-rating-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .pd-rating-row .stars { font-size: 1rem; }
+    .pd-rating-row a {
+      color: var(--royal-blue);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: underline;
+      cursor: pointer;
+      border: 0;
+      background: none;
+      padding: 0;
+      font: inherit;
+    }
+    .pd-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .tag-pill {
+      display: inline-block;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid #1a1a1a;
+      background: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #111;
+    }
+    .pd-price-hero {
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 800;
+      color: #c40018;
+      letter-spacing: -0.02em;
+    }
+    .pd-price-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .pd-stock-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-weight: 700; font-size: 0.95rem; }
+    .pd-stock-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .pd-stock-dot.ok { background: var(--ok); box-shadow: 0 0 0 2px rgba(13, 143, 68, 0.25); }
+    .pd-stock-dot.warn { background: var(--warn); box-shadow: 0 0 0 2px rgba(198, 123, 0, 0.25); }
+    .pd-stock-dot.bad { background: var(--bad); box-shadow: 0 0 0 2px rgba(190, 42, 42, 0.25); }
+    .pd-checklist {
+      list-style: none;
+      margin: 0 0 18px;
+      padding: 0;
+      border-top: 1px solid #e8ecf4;
+      border-bottom: 1px solid #e8ecf4;
+    }
+    .pd-checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e293b;
+      border-bottom: 1px solid #eef1f7;
+    }
+    .pd-checklist li:last-child { border-bottom: 0; }
+    .pd-checklist li::before {
+      content: "";
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+      flex-shrink: 0;
+      background: no-repeat center / contain;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d8f44' stroke-width='2.2'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+    }
+    .pd-cta-row { display: flex; gap: 10px; align-items: stretch; max-width: 520px; flex-wrap: wrap; }
+    .pd-btn-cart {
+      flex: 1;
+      min-width: 200px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #ffc400;
+      color: #111;
+      border: 0;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: filter var(--transition), transform var(--transition);
+    }
+    .pd-btn-cart:hover { filter: brightness(1.03); transform: translateY(-1px); }
+    .pd-btn-cart svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .pd-btn-wish {
+      width: 52px;
+      min-width: 52px;
+      border-radius: 8px;
+      border: 1px solid #cfd8e8;
+      background: #fff;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .pd-btn-wish:hover { background: #f8fafc; border-color: #b8c6dc; }
+    .pd-btn-wish svg { width: 24px; height: 24px; }
+    .pd-btn-wish.active svg { fill: #e82f67; stroke: #e82f67; }
+
+    .pd-accordions { margin-top: 18px; padding: 0; overflow: hidden; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; box-shadow: var(--shadow); }
+    .acc-item { border-bottom: 1px solid #e5e7eb; }
+    .acc-item:last-child { border-bottom: 0; }
+    .acc-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 0;
+      background: #f3f4f6;
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #111;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: background var(--transition);
+    }
+    .acc-trigger:hover { background: #eceef2; }
+    .acc-trigger[aria-expanded="false"] + .acc-panel { display: none; }
+    .acc-chev { font-size: 0.75rem; color: #64748b; transition: transform var(--transition); }
+    .acc-trigger[aria-expanded="true"] .acc-chev { transform: rotate(180deg); }
+    .acc-panel { padding: 16px 18px 20px; background: #fff; }
+    .acc-panel p { margin: 0 0 12px; line-height: 1.55; color: #334155; font-size: 0.95rem; }
+    .acc-panel p:last-child { margin-bottom: 0; }
+    .spec-table-pro { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    .spec-table-pro tr { border-bottom: 1px solid #eef1f7; }
+    .spec-table-pro td { padding: 10px 0; vertical-align: top; }
+    .spec-table-pro td:first-child { color: #64748b; font-weight: 600; width: 42%; padding-right: 12px; }
+    .spec-table-pro td:last-child { color: #0f172a; font-weight: 600; }
+
+    #pd-desc, #pd-specs, #pd-reviews { scroll-margin-top: 120px; }
+
+    .pd-sticky-buy {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 90;
+      background: rgba(255, 255, 255, 0.96);
+      border-top: 1px solid #e2e8f0;
+      box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+      backdrop-filter: blur(8px);
+    }
+    .pd-sticky-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 10px 0;
+      min-height: 58px;
+    }
+    .pd-sticky-tabs { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+    .pd-sticky-tabs a {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #475569;
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 2px;
+    }
+    .pd-sticky-tabs a:hover { color: var(--royal-blue); }
+    .pd-sticky-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+    .pd-sticky-price { font-weight: 800; font-size: 1.15rem; color: #0f172a; }
+    .pd-sticky-note { font-size: 0.72rem; color: #64748b; max-width: 200px; line-height: 1.3; }
+    .pd-sticky-buy .pd-btn-cart { min-width: 160px; padding: 12px 16px; font-size: 0.92rem; }
+    .pd-page-spacer { height: 72px; }
+    .rating-big { font-size: 1.8rem; color: #ff9d00; font-weight: 800; }
+    .review {
+      padding: 12px;
+      border-radius: 8px;
+      background: #fafcff;
+      border: 1px solid #e7edf8;
+      margin-bottom: 10px;
+    }
+    .review small { color: var(--muted); }
+    .stars { color: #ff9d00; letter-spacing: 1px; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .form-card { padding: 16px; }
+    .form-card input, .form-card textarea, .form-card select {
+      width: 100%;
+      border: 1px solid #ced7e8;
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 5px;
+      background: #fff;
+    }
+    .form-card textarea { min-height: 90px; resize: vertical; }
+    .help { font-size: 0.86rem; color: var(--muted); margin-top: 7px; }
+    .muted { color: var(--muted); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid #e7edf8;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid #edf2fb;
+      vertical-align: top;
+      font-size: 0.94rem;
+    }
+    th { background: #f7faff; color: #415072; }
+
+    .footer {
+      background: #1f2c47;
+      color: #cfd7e6;
+      margin-top: 30px;
+      padding: 30px 0;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 40px;
+    }
+    .footer h4 { color: #fff; margin: 0 0 9px; }
+    .footer a { display: inline-block; margin: 4px 10px 4px 0; color: #d9e3f8; }
+    .footer a:hover { color: #fff; }
+    .small-line { margin-top: 14px; color: #9fb0d2; font-size: 0.88rem; }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: #eaf1ff;
+      color: var(--royal-blue);
+    }
+
+    .empty-state { padding: 22px; text-align: center; color: var(--muted); }
+    .benefits-row {
+      margin: 14px 0 6px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .benefit-card {
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #dce8fd;
+      background: #f7faff;
+      color: #1f3a76;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .breadcrumb { font-size: 0.88rem; color: #7081a1; margin-bottom: 8px; }
+    .breadcrumb button {
+      border: 0;
+      background: none;
+      color: #5c6f93;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    .cart-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+    }
+    .summary-card {
+      margin-top: 12px;
+      padding: 16px;
+      max-width: 460px;
+      background: linear-gradient(180deg, #ffffff, #f8fbff);
+    }
+    .trust-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .trust-badges span {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid #d8e4fb;
+      background: #f3f7ff;
+      color: #2c4c8f;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 6px 10px;
+    }
+    .checkout-layout {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .toast-wrap {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 200;
+      display: grid;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      min-width: 260px;
+      max-width: 360px;
+      background: #fff;
+      border: 1px solid #d9e4f8;
+      box-shadow: var(--shadow);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #203257;
+      animation: in var(--transition) forwards;
+    }
+    .toast.ok { border-left: 4px solid #0d8f44; }
+    .toast.warn { border-left: 4px solid #c67b00; }
+    .toast.bad { border-left: 4px solid #be2a2a; }
+
+    @media (max-width: 980px) {
+      .topbar-inner { grid-template-columns: 1fr; gap: 10px; }
+      .header-actions { justify-content: flex-start; flex-wrap: wrap; }
+      .nav-inner { overflow-x: auto; white-space: nowrap; }
+      .filters { grid-template-columns: 1fr 1fr; }
+      .filters.sticky { position: static; }
+      .product-detail { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .checkout-layout { grid-template-columns: 1fr; }
+      th, td { min-width: 120px; }
+    }
+    @media (max-width: 620px) {
+      .filters { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="promo-strip">
+    <div class="container">
+      <a href="#" data-nav="delivery">Binnen 30 minuten ophalen</a>
+      <a href="#" data-nav="about">CertoDeals App</a>
+      <a href="#" data-nav="delivery">Voor 23:59 besteld, morgen in huis*</a>
+    </div>
+  </div>
+  <div class="trust-strip">
+    <div class="container">
+      <span class="trust-item">Gratis verzending vanaf 25,-</span>
+      <span class="trust-item">Bezorging dezelfde dag mogelijk</span>
+      <span class="trust-item">Gratis retourneren</span>
+      <span class="trust-item">Ontdek 4 klantvoordelen</span>
+    </div>
+  </div>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="logo" data-nav="home">Certo<span>Deals</span></div>
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Zoek op product, merk of categorie..." />
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" data-nav="wishlist">Verlanglijst <span id="wishlistCount" class="counter">0</span></button>
+        <button class="icon-btn" data-nav="cart">Winkelmand <span id="cartCount" class="counter">0</span></button>
+        <span id="userChip" class="user-chip"></span>
+        <button class="login-btn" data-nav="login">Inloggen</button>
+        <button id="logoutBtn" class="ghost-btn" style="display:none; width:auto; padding:10px 12px;">Uitloggen</button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <div class="container nav-inner" id="navCategories"></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="app"></div>
+  </main>
+  <div id="toastWrap" class="toast-wrap"></div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>Klantenservice</h4>
+          <a href="#" data-nav="returns">Retourbeleid</a>
+          <a href="#" data-nav="delivery">Levertijden & bezorging</a>
+          <a href="#" data-nav="tracking">Order tracking</a>
+          <a href="#" data-nav="contact">Contact</a>
+        </div>
+        <div>
+          <h4>Over CertoDeals</h4>
+          <a href="#" data-nav="about">Over ons</a>
+          <a href="#" data-nav="why-payment">Waarom betaalverzoek?</a>
+          <a href="#" data-nav="company">Bedrijfsinformatie</a>
+          <a href="#" data-nav="privacy">Privacybeleid</a>
+        </div>
+      </div>
+      <div class="small-line">KVK: KVK_PLACEHOLDER | BTW: BTW_PLACEHOLDER | Adres: ADRES_PLACEHOLDER</div>
+    </div>
+  </footer>
+
+  <script>
+    const FORMSPREE_ENDPOINT = "https://formspree.io/f/maqlzglb";
+    const WHATSAPP_NUMMER = "WHATSAPP_NUMMER";
+    const IBAN = "IBAN_PLACEHOLDER";
+    const BANK_NAAM = "NAAM_PLACEHOLDER";
+
+    const categoryMap = {
+      "Elektronica": ["Telefoons", "Laptops", "Tablets", "Televisies", "Audio", "Gaming"],
+      "Keukenapparatuur": ["Koffiezetapparaten", "Airfryers", "Blenders & mixers", "Magnetrons", "Broodroosters & waterkokers"],
+      "Witgoed": ["Wasmachines", "Drogers", "Koelkasten", "Vaatwassers"],
+      "Fatbikes & Fietsen": ["Fatbikes elektrisch", "Fatbikes normaal", "Stadsfietsen", "Accessoires"]
+    };
+
+    const brandsBySubcat = {
+      "Telefoons": ["Apple", "Samsung", "Xiaomi", "OnePlus"],
+      "Laptops": ["Apple", "Dell", "HP", "Lenovo"],
+      "Tablets": ["Apple", "Samsung", "Lenovo"],
+      "Televisies": ["Samsung", "LG", "Sony"],
+      "Audio": ["Sony", "JBL", "Bose", "Apple"],
+      "Gaming": ["PlayStation", "Xbox", "Nintendo", "Logitech"],
+      "Koffiezetapparaten": ["Philips", "DeLonghi", "Krups"],
+      "Airfryers": ["Philips", "Ninja", "Tefal"],
+      "Blenders & mixers": ["KitchenAid", "Philips", "Bosch"],
+      "Magnetrons": ["Samsung", "Whirlpool", "Panasonic"],
+      "Broodroosters & waterkokers": ["Russell Hobbs", "Smeg", "Philips"],
+      "Wasmachines": ["Bosch", "Samsung", "AEG"],
+      "Drogers": ["Bosch", "Miele", "AEG"],
+      "Koelkasten": ["Samsung", "LG", "Beko"],
+      "Vaatwassers": ["Bosch", "Siemens", "Whirlpool"],
+      "Fatbikes elektrisch": ["Phatfour", "Engwe", "Ado"],
+      "Fatbikes normaal": ["Cortina", "Popal", "Brinckers"],
+      "Stadsfietsen": ["Gazelle", "Batavus", "Cortina"],
+      "Accessoires": ["ABUS", "Kryptonite", "Basil"]
+    };
+
+    const stockOptions = ["Op voorraad", "Beperkte voorraad", "Uitverkocht"];
+    const deliveryBySubcat = {
+      "Wasmachines": "3-7 werkdagen incl. installatie",
+      "Drogers": "3-7 werkdagen incl. installatie",
+      "Koelkasten": "3-7 werkdagen incl. installatie",
+      "Vaatwassers": "3-7 werkdagen incl. installatie",
+      "Fatbikes elektrisch": "2-5 werkdagen",
+      "Fatbikes normaal": "2-5 werkdagen",
+      "Stadsfietsen": "2-5 werkdagen",
+      default: "1-3 werkdagen"
+    };
+
+    const reviewPool = [
+      { name: "Sanne de Vries", text: "Snelle levering en product exact zoals beschreven. Zeer tevreden!" },
+      { name: "Youssef El Amrani", text: "Topdeal, veel goedkoper dan elders. Klantenservice reageert snel." },
+      { name: "Iris van Dijk", text: "Mooi verpakt ontvangen en werkt perfect. Zeker een aanrader." },
+      { name: "Mark Jansen", text: "Goede prijs/kwaliteit, duidelijke communicatie over de bezorging." },
+      { name: "Nadia Bakker", text: "Eerst twijfels, maar alles netjes afgehandeld. Koop hier opnieuw." }
+    ];
+
+    function euro(v) {
+      return new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(v);
+    }
+    function stars(v) {
+      const full = "★".repeat(Math.round(v));
+      const empty = "☆".repeat(5 - Math.round(v));
+      return full + empty;
+    }
+    function slug(v) {
+      return v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    }
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+    function parseProductLongDesc(longDesc) {
+      const lines = String(longDesc || "").split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const intro = [];
+      const specs = [];
+      let inSpecs = false;
+      for (const line of lines) {
+        if (/^specificaties\s*:?\s*$/i.test(line)) {
+          inSpecs = true;
+          continue;
+        }
+        if (inSpecs && line.startsWith("-")) {
+          const rest = line.replace(/^\-\s*/, "");
+          const colon = rest.indexOf(":");
+          if (colon !== -1) {
+            specs.push({ key: rest.slice(0, colon).trim(), val: rest.slice(colon + 1).trim() });
+          } else specs.push({ key: "", val: rest });
+        } else if (!inSpecs) {
+          intro.push(line);
+        }
+      }
+      const introParas = intro.length ? intro.map(t => `<p>${escapeHtml(t)}</p>`).join("") : `<p>${escapeHtml(String(longDesc || ""))}</p>`;
+      return { introParas, specs };
+    }
+    function randFrom(arr, idx) { return arr[idx % arr.length]; }
+
+    function createProducts() {
+      const products = [];
+      let idCounter = 1;
+      Object.entries(categoryMap).forEach(([category, subcats], cIdx) => {
+        subcats.forEach((subcat, sIdx) => {
+          const brands = brandsBySubcat[subcat] || ["Certo"];
+          brands.forEach((brand, bIdx) => {
+            for (let i = 1; i <= 2; i++) {
+              const base = 120 + (cIdx * 190) + (sIdx * 45) + (bIdx * 35) + (i * 25);
+              const oldPrice = Math.round(base + 120 + (i * 35));
+              const discount = 18 + ((idCounter * 7) % 42);
+              const newPrice = +(oldPrice * (1 - discount / 100)).toFixed(2);
+              const rating = +(3.6 + ((idCounter * 13) % 14) / 10).toFixed(1);
+              const stock = randFrom(stockOptions, idCounter);
+              const installCost = category === "Witgoed" ? 49.95 : 0;
+              const name = `${brand} ${subcat.replace(" & ", " ")} ${2022 + (idCounter % 5)} Pro ${i}`;
+              const shortDesc = `High-end ${subcat.toLowerCase()} van ${brand} met premium afwerking en scherpe dealprijs.`;
+              const longDesc = `${name} is zorgvuldig geselecteerd uit overstock en retourpartijen van A-merken.`
+                + `\nSpecificaties:`
+                + `\n- Merk: ${brand}`
+                + `\n- Categorie: ${category} / ${subcat}`
+                + `\n- Conditie: Nieuw of B-keuze (altijd gecontroleerd)`
+                + `\n- Garantie: 12 maanden`
+                + `\n- Levertijd: ${deliveryBySubcat[subcat] || deliveryBySubcat.default}`
+                + `${installCost ? `\n- Installatiekosten: ${euro(installCost)}` : ""}`;
+              const image = `https://placehold.co/700x500/eaf1ff/1c2e59?text=${encodeURIComponent(brand + " " + subcat)}`;
+              const baseReviews = [0,1,2].map(n => {
+                const p = reviewPool[(idCounter + n) % reviewPool.length];
+                const rv = Math.max(1, Math.min(5, Math.round(rating + (n - 1))));
+                return { name: p.name, rating: rv, text: p.text };
+              });
+              products.push({
+                id: idCounter++,
+                slug: slug(name) + "-" + Math.floor(Math.random() * 999),
+                category, subcat, brand, name, shortDesc, longDesc, oldPrice, newPrice, discount, stock,
+                delivery: deliveryBySubcat[subcat] || deliveryBySubcat.default, rating, image, installCost,
+                isNew: (idCounter % 3 === 0), popularity: (idCounter * 11) % 100, baseReviews
+              });
+            }
+          });
+        });
+      });
+      return products;
+    }
+    const PRODUCTS = createProducts();
+
+    function allProducts() {
+      return [...customProducts, ...PRODUCTS];
+    }
+
+    const storage = {
+      get(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
+      set(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+    };
+    let customProducts = storage.get("cd_custom_products", []);
+    let cart = storage.get("cd_cart", []);
+    let wishlist = storage.get("cd_wishlist", []);
+    let users = storage.get("cd_users", []);
+    let activeUser = storage.get("cd_active_user", null);
+    let orders = storage.get("cd_orders", []);
+    let userReviews = storage.get("cd_user_reviews", {});
+
+    const app = document.getElementById("app");
+    const navCategories = document.getElementById("navCategories");
+    const searchInput = document.getElementById("searchInput");
+    const loginBtn = document.querySelector(".login-btn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userChip = document.getElementById("userChip");
+    const toastWrap = document.getElementById("toastWrap");
+
+    function showToast(text, type = "ok") {
+      const el = document.createElement("div");
+      el.className = `toast ${type}`;
+      el.textContent = text;
+      toastWrap.appendChild(el);
+      setTimeout(() => {
+        el.remove();
+      }, 2800);
+    }
+
+    function saveAll() {
+      storage.set("cd_cart", cart);
+      storage.set("cd_wishlist", wishlist);
+      storage.set("cd_users", users);
+      storage.set("cd_active_user", activeUser);
+      storage.set("cd_orders", orders);
+      storage.set("cd_user_reviews", userReviews);
+      storage.set("cd_custom_products", customProducts);
+    }
+
+    function updateCounters() {
+      document.getElementById("cartCount").textContent = cart.reduce((a, c) => a + c.qty, 0);
+      document.getElementById("wishlistCount").textContent = wishlist.length;
+      if (activeUser) {
+        userChip.style.display = "inline-block";
+        userChip.textContent = `Ingelogd: ${activeUser.email}`;
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+      } else {
+        userChip.style.display = "none";
+        userChip.textContent = "";
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+      }
+    }
+
+    function initNav() {
+      const menuBlock = `
+        <div class="nav-item menu-nav-item">
+          ☰ Alle categorieen
+          <div class="dropdown">
+            <div class="menu-grid">
+              ${Object.entries(categoryMap).map(([cat, subs]) => `
+                <div>
+                  <div class="menu-title">${cat}</div>
+                  ${subs.map(s => `<a href="#" data-nav="subcategory" data-category="${cat}" data-subcat="${s}">${s}</a>`).join("")}
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+      navCategories.innerHTML = menuBlock + Object.entries(categoryMap).map(([cat, subs]) => `
+        <div class="nav-item" data-open-category="${cat}">
+          ${cat}
+          <div class="dropdown">
+            ${subs.map(s => `<a href="#" data-nav="subcategory" data-category="${cat}" data-subcat="${s}">${s}</a>`).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function navigate(route, push = true) {
+      const state = route || { page: "home" };
+      if (push) history.pushState(state, "", location.pathname);
+      render(state);
+    }
+    window.addEventListener("popstate", (e) => render(e.state || { page: "home" }));
+
+    function getProduct(id) { return allProducts().find(p => p.id === Number(id)); }
+    function getCartRows() {
+      return cart.map(item => {
+        const p = getProduct(item.id);
+        return { ...item, p, subtotal: +(p.newPrice * item.qty).toFixed(2), installTotal: +(p.installCost * item.qty).toFixed(2) };
+      }).filter(r => r.p);
+    }
+    function totals() {
+      const rows = getCartRows();
+      const productsTotal = rows.reduce((a, r) => a + r.subtotal, 0);
+      const install = rows.reduce((a, r) => a + r.installTotal, 0);
+      const shipping = productsTotal > 50 || productsTotal === 0 ? 0 : 6.95;
+      return { productsTotal, install, shipping, grand: +(productsTotal + install + shipping).toFixed(2) };
+    }
+    function wishlistHas(id) { return wishlist.includes(id); }
+    function toggleWishlist(id) {
+      if (wishlistHas(id)) wishlist = wishlist.filter(x => x !== id);
+      else wishlist.push(id);
+      saveAll(); updateCounters();
+      const current = history.state || { page: "home" };
+      render(current);
+    }
+    function addCart(id) {
+      const p = getProduct(id);
+      if (!p || p.stock === "Uitverkocht") return showToast("Dit product is momenteel uitverkocht.", "bad");
+      const found = cart.find(x => x.id === id);
+      if (found) found.qty += 1;
+      else cart.push({ id, qty: 1 });
+      saveAll(); updateCounters();
+      showToast("Toegevoegd aan winkelmand.", "ok");
+    }
+
+    function stockClass(stock) {
+      if (stock === "Op voorraad") return "ok";
+      if (stock === "Beperkte voorraad") return "warn";
+      return "bad";
+    }
+
+    function productCard(p) {
+      return `
+      <article class="card product-card">
+        <span class="badge">-${p.discount}%</span>
+        <button class="heart ${wishlistHas(p.id) ? "active" : ""}" data-action="wishlist" data-id="${p.id}" title="Verlanglijst">❤</button>
+        <img src="${p.image}" alt="${p.name}" />
+        <div class="product-content">
+          <h3 class="product-title" data-nav="product" data-id="${p.id}">${p.name}</h3>
+          <p class="short">${p.shortDesc}</p>
+          <div class="price-line">
+            <span class="old-price">${euro(p.oldPrice)}</span>
+            <span class="new-price">${euro(p.newPrice)}</span>
+          </div>
+          <div class="muted">${stars(p.rating)} ${p.rating} · ${p.brand}</div>
+          <div class="stock ${stockClass(p.stock)}">${p.stock}</div>
+          <div class="muted">Levertijd: ${p.delivery}</div>
+          ${p.installCost ? `<div class="pill">+ ${euro(p.installCost)} installatie</div>` : ""}
+          <div class="actions-inline">
+            <button class="primary-btn" data-action="add-cart" data-id="${p.id}">In winkelmand</button>
+            <button class="ghost-btn" data-nav="product" data-id="${p.id}">Bekijk</button>
+          </div>
+        </div>
+      </article>`;
+    }
+
+    function withPage(html) {
+      return `<section class="page">${html}</section>`;
+    }
+
+    function pageHome() {
+      const topDeals = [...allProducts()].sort((a, b) => b.discount - a.discount).slice(0, 8);
+      const popular = [...allProducts()].sort((a, b) => b.popularity - a.popularity).slice(0, 8);
+      return withPage(`
+        <section class="hero">
+          <h1>High-end producten met maximale korting</h1>
+          <p>CertoDeals koopt retourpartijen, overstock en B-keuze goederen in bulk in van grote retailers. Daardoor betaal jij structureel minder, zonder in te leveren op kwaliteit of service.</p>
+          <div class="hero-kpis">
+            <span>Gratis verzending vanaf EUR 50</span>
+            <span>14 dagen retour</span>
+            <span>Gemiddeld 25-40% korting</span>
+            <span>Snelle klantenservice</span>
+          </div>
+        </section>
+        <div class="benefits-row">
+          <div class="benefit-card">✔ Snelle levering in heel Nederland & Belgie</div>
+          <div class="benefit-card">✔ Altijd scherpe kortingen op A-merken</div>
+          <div class="benefit-card">✔ Veilig bestellen en duidelijke service</div>
+          <div class="benefit-card">✔ Echte klantenreviews per product</div>
+        </div>
+        <h2 class="section-title">Categorieen</h2>
+        <div class="cat-grid">
+          ${Object.keys(categoryMap).map(cat => `
+            <article class="card cat-card" data-nav="category" data-category="${cat}">
+              <h3>${cat}</h3>
+              <p>${categoryMap[cat].length} subcategorieen</p>
+            </article>
+          `).join("")}
+        </div>
+        <h2 class="section-title">Topdeals</h2>
+        <div class="product-grid">${topDeals.map(productCard).join("")}</div>
+        <h2 class="section-title">Populaire producten</h2>
+        <div class="product-grid">${popular.map(productCard).join("")}</div>
+      `);
+    }
+
+    function filterPanel(state, products, targetKey = "listing") {
+      const brands = [...new Set(products.map(p => p.brand))].sort();
+      const max = products.length ? Math.ceil(Math.max(...products.map(p => p.newPrice), 500)) : 500;
+      const currentPrice = state.maxPrice || max;
+      return `
+      <div class="card filters sticky">
+        <div class="filter-group">
+          <label>Prijs (max)</label>
+          <div class="range-inline">
+            <input type="range" min="20" max="${max}" step="5" value="${currentPrice}" data-filter="max-price" data-target="${targetKey}" />
+            <span>t/m ${euro(currentPrice)}</span>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label>Merk</label>
+          <select data-filter="brand" data-target="${targetKey}">
+            <option value="">Alle merken</option>
+            ${brands.map(b => `<option value="${b}" ${state.brand === b ? "selected" : ""}>${b}</option>`).join("")}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Beoordeling</label>
+          <select data-filter="rating" data-target="${targetKey}">
+            <option value="0">Alle ratings</option>
+            <option value="4" ${Number(state.rating || 0) === 4 ? "selected" : ""}>4+ sterren</option>
+            <option value="3" ${Number(state.rating || 0) === 3 ? "selected" : ""}>3+ sterren</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Sorteren op</label>
+          <select data-filter="sort" data-target="${targetKey}">
+            <option value="pop" ${state.sort === "pop" ? "selected" : ""}>Populairste</option>
+            <option value="new" ${state.sort === "new" ? "selected" : ""}>Nieuwste</option>
+            <option value="plh" ${state.sort === "plh" ? "selected" : ""}>Prijs laag-hoog</option>
+            <option value="phl" ${state.sort === "phl" ? "selected" : ""}>Prijs hoog-laag</option>
+          </select>
+        </div>
+      </div>`;
+    }
+
+    function applyFilters(list, state) {
+      const maxPrice = Number(state.maxPrice || 999999);
+      const minRating = Number(state.rating || 0);
+      const brand = state.brand || "";
+      const q = String(state.query || "").trim().toLowerCase();
+      let out = list.filter(p =>
+        p.newPrice <= maxPrice &&
+        p.rating >= minRating &&
+        (!brand || p.brand === brand) &&
+        (!q || p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.subcat.toLowerCase().includes(q))
+      );
+      switch (state.sort) {
+        case "plh": out.sort((a, b) => a.newPrice - b.newPrice); break;
+        case "phl": out.sort((a, b) => b.newPrice - a.newPrice); break;
+        case "new": out.sort((a, b) => Number(b.isNew) - Number(a.isNew) || b.id - a.id); break;
+        default: out.sort((a, b) => b.popularity - a.popularity);
+      }
+      return out;
+    }
+
+    function pageCategory(state) {
+      const category = state.category;
+      const subs = categoryMap[category] || [];
+      const inCategory = allProducts().filter(p => p.category === category);
+      const filtered = applyFilters(inCategory, state);
+      return withPage(`
+        <div class="breadcrumb"><button data-nav="home">Home</button> / ${category}</div>
+        <h1>${category}</h1>
+        <p class="muted">Kies eerst een subcategorie of blader direct door alle deals.</p>
+        <div class="subcat-grid">
+          ${subs.map(s => `<article class="card subcat-card" data-nav="subcategory" data-category="${category}" data-subcat="${s}">
+              <h3>${s}</h3><p>${allProducts().filter(p => p.subcat === s).length} producten</p>
+          </article>`).join("")}
+        </div>
+        <h2 class="section-title">Alle ${category} producten</h2>
+        ${filterPanel(state, inCategory, "category")}
+        <div class="product-grid">${filtered.length ? filtered.map(productCard).join("") : `<div class="empty-state card">Geen producten gevonden voor dit filter.</div>`}</div>
+      `);
+    }
+
+    function pageSubcategory(state) {
+      const { category, subcat } = state;
+      const products = allProducts().filter(p => p.category === category && p.subcat === subcat);
+      const groups = [...new Set(products.map(p => p.brand))];
+      return withPage(`
+        <div class="breadcrumb"><button data-nav="home">Home</button> / <button data-nav="category" data-category="${category}">${category}</button> / ${subcat}</div>
+        <h1>${subcat}</h1>
+        <p class="muted">Selecteer een merk om naar de productoverzichtspagina te gaan.</p>
+        <div class="subcat-grid">
+          ${groups.length ? groups.map(g => `<article class="card subcat-card" data-nav="listing" data-category="${category}" data-subcat="${subcat}" data-brand="${g}">
+            <h3>${g}</h3><p>${products.filter(p => p.brand === g).length} deals</p>
+          </article>`).join("") : `<div class="card empty-state">Nog geen merken beschikbaar in deze subcategorie.</div>`}
+        </div>
+        <h2 class="section-title">Alle ${subcat}</h2>
+        ${filterPanel(state, products, "subcategory")}
+        <div class="product-grid">${applyFilters(products, state).length ? applyFilters(products, state).map(productCard).join("") : `<div class="empty-state card">Geen producten gevonden voor deze selectie.</div>`}</div>
+      `);
+    }
+
+    function pageListing(state) {
+      const { category, subcat, brand } = state;
+      const list = allProducts().filter(p =>
+        (!category || p.category === category) &&
+        (!subcat || p.subcat === subcat) &&
+        (!brand || p.brand === brand)
+      );
+      const filtered = applyFilters(list, state);
+      const title = state.query ? `Zoekresultaten voor "${state.query}"` : `Productoverzicht ${brand ? "- " + brand : ""}`;
+      return withPage(`
+        <div class="breadcrumb"><button data-nav="home">Home</button> / ${category || "Resultaten"} ${subcat ? `/ ${subcat}` : ""} ${brand ? `/ ${brand}` : ""}</div>
+        <h1>${title}</h1>
+        <p class="muted">${filtered.length} producten gevonden.</p>
+        ${filterPanel(state, list, "listing")}
+        <div class="product-grid">${filtered.length ? filtered.map(productCard).join("") : `<div class="empty-state card">Geen resultaten voor deze selectie.</div>`}</div>
+      `);
+    }
+
+    function combinedReviews(productId, base) {
+      const extra = userReviews[productId] || [];
+      return [...base, ...extra];
+    }
+
+    function pageProduct(state) {
+      const p = getProduct(state.id);
+      if (!p) return withPage(`<div class="card empty-state">Product niet gevonden.</div>`);
+      const reviews = combinedReviews(p.id, p.baseReviews);
+      const avg = (reviews.reduce((a, r) => a + Number(r.rating), 0) / reviews.length).toFixed(1);
+      const { introParas, specs } = parseProductLongDesc(p.longDesc);
+      const specRows = specs.length
+        ? specs.map(s => (s.key
+          ? `<tr><td>${escapeHtml(s.key)}</td><td>${escapeHtml(s.val)}</td></tr>`
+          : `<tr><td colspan="2">${escapeHtml(s.val)}</td></tr>`)).join("")
+        : `<tr><td colspan="2" class="muted">Geen specificaties beschikbaar.</td></tr>`;
+      const sc = stockClass(p.stock);
+      const cartSvg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 6h15l-1.5 9h-12L4.5 4H2'/><circle cx='9' cy='20' r='1'/><circle cx='18' cy='20' r='1'/></svg>";
+      const heartSvg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/></svg>";
+      return withPage(`
+        <div class="breadcrumb"><button data-nav="home">Home</button> / <button data-nav="category" data-category="${p.category}">${p.category}</button> / <button data-nav="subcategory" data-category="${p.category}" data-subcat="${p.subcat}">${p.subcat}</button> / ${escapeHtml(p.name)}</div>
+        <article class="card product-detail pd-main">
+          <div><img src="${p.image}" alt="${escapeHtml(p.name)}" /></div>
+          <div class="pd-buy">
+            <h1>${escapeHtml(p.name)}</h1>
+            <div class="pd-rating-row">
+              <span class="stars">${stars(Number(avg))}</span>
+              <span class="muted" style="font-weight:700;">${avg}</span>
+              <a href="#pd-reviews">${reviews.length} beoordelingen</a>
+            </div>
+            <p class="muted" style="margin:0 0 12px;line-height:1.5;">${escapeHtml(p.shortDesc)}</p>
+            <div class="pd-tags">
+              <span class="tag-pill">${escapeHtml(p.brand)}</span>
+              <span class="tag-pill">${escapeHtml(p.category)}</span>
+              <span class="tag-pill">${escapeHtml(p.subcat)}</span>
+            </div>
+            <div class="pd-price-row">
+              <span class="pd-price-hero">${euro(p.newPrice)}</span>
+              <span class="old-price">${euro(p.oldPrice)}</span>
+              <span class="badge" style="position:static;">-${p.discount}%</span>
+            </div>
+            <div class="pd-stock-row">
+              <span class="pd-stock-dot ${sc}" aria-hidden="true"></span>
+              <span class="stock ${sc}">${escapeHtml(p.stock)}</span>
+              <span class="muted" style="font-weight:600;">· Levertijd: ${escapeHtml(p.delivery)}</span>
+            </div>
+            ${p.installCost ? `<p class="pill" style="margin:0 0 14px;">Installatie: +${euro(p.installCost)}</p>` : ""}
+            <ul class="pd-checklist">
+              <li>Gratis verzending vanaf EUR 50 (anders EUR 6,95)</li>
+              <li>14 dagen retourrecht conform wet</li>
+              <li>Geselecteerde A-merk deals met controle voor verzending</li>
+              <li>12 maanden garantie op dit product</li>
+            </ul>
+            <div class="pd-cta-row">
+              <button type="button" class="pd-btn-cart" data-action="add-cart" data-id="${p.id}">${cartSvg} In winkelmand</button>
+              <button type="button" class="pd-btn-wish ${wishlistHas(p.id) ? "active" : ""}" data-action="wishlist" data-id="${p.id}" title="Verlanglijst">${heartSvg}</button>
+            </div>
+          </div>
+        </article>
+
+        <section class="pd-accordions" aria-label="Productinformatie">
+          <div class="acc-item" id="pd-desc">
+            <button type="button" class="acc-trigger" aria-expanded="true">
+              Productbeschrijving
+              <span class="acc-chev">▼</span>
+            </button>
+            <div class="acc-panel">
+              ${introParas}
+            </div>
+          </div>
+          <div class="acc-item">
+            <button type="button" class="acc-trigger" aria-expanded="false">
+              Levering &amp; service
+              <span class="acc-chev">▼</span>
+            </button>
+            <div class="acc-panel">
+              <p>We verzenden met betrouwbare pakketdiensten. Grote apparaten en witgoed worden in overleg ingepland.</p>
+              <p><strong>Bezorging:</strong> ${escapeHtml(p.delivery)}${p.installCost ? ` · installatieoptioneel ${euro(p.installCost)}` : ""}.</p>
+              <p><strong>Retour:</strong> binnen 14 dagen na ontvangst, mits ongebruikt en in originele staat. Neem contact op met je ordernummer.</p>
+            </div>
+          </div>
+          <div class="acc-item" id="pd-specs">
+            <button type="button" class="acc-trigger" aria-expanded="false">
+              Specificaties
+              <span class="acc-chev">▼</span>
+            </button>
+            <div class="acc-panel">
+              <table class="spec-table-pro">${specRows}</table>
+            </div>
+          </div>
+        </section>
+
+        <h2 id="pd-reviews" class="section-title">Beoordelingen</h2>
+        <div class="card" style="padding:14px;">
+          <div class="rating-big">${avg} ${stars(Number(avg))}</div>
+          <div class="muted">${reviews.length} reviews</div>
+          <div style="margin-top:12px;">
+            ${reviews.map(r => `<div class="review"><strong>${escapeHtml(r.name)}</strong> <span class="stars">${stars(Number(r.rating))}</span><br /><small>${escapeHtml(r.text)}</small></div>`).join("")}
+          </div>
+        </div>
+        <div class="form-card" style="margin-top:12px;">
+          <h3>Laat een review achter</h3>
+          <form id="reviewForm">
+            <div class="form-grid">
+              <label>Naam<input required name="name" /></label>
+              <label>Beoordeling
+                <select required name="rating">
+                  <option value="5">5 sterren</option><option value="4">4 sterren</option><option value="3">3 sterren</option>
+                  <option value="2">2 sterren</option><option value="1">1 ster</option>
+                </select>
+              </label>
+            </div>
+            <label>Reviewtekst<textarea required name="text"></textarea></label>
+            <input type="hidden" name="productId" value="${p.id}" />
+            <button class="primary-btn" type="submit">Review plaatsen</button>
+          </form>
+        </div>
+
+        <div class="pd-page-spacer" aria-hidden="true"></div>
+        <div class="pd-sticky-buy" role="region" aria-label="Snel bestellen">
+          <div class="container pd-sticky-inner">
+            <nav class="pd-sticky-tabs" aria-label="Secties">
+              <a href="#pd-desc">Beschrijving</a>
+              <a href="#pd-specs">Specificaties</a>
+              <a href="#pd-reviews">Beoordelingen</a>
+            </nav>
+            <div class="pd-sticky-right">
+              <div>
+                <div class="pd-sticky-price">${euro(p.newPrice)}</div>
+                <div class="pd-sticky-note">incl. BTW · gratis verzending vanaf EUR 50</div>
+              </div>
+              <button type="button" class="pd-btn-cart" data-action="add-cart" data-id="${p.id}">${cartSvg} Winkelmand</button>
+            </div>
+          </div>
+        </div>
+      `);
+    }
+
+    function pageCart() {
+      const rows = getCartRows();
+      const t = totals();
+      return withPage(`
+        <h1>Winkelmand</h1>
+        <div class="trust-badges">
+          <span>Veilig afrekenen</span>
+          <span>14 dagen retour</span>
+          <span>Snelle bezorging</span>
+        </div>
+        ${rows.length ? `
+        <div class="cart-table-wrap">
+          <table>
+            <thead><tr><th>Product</th><th>Prijs</th><th>Aantal</th><th>Subtotaal</th><th>Installatie</th><th></th></tr></thead>
+            <tbody>
+              ${rows.map(r => `
+                <tr>
+                  <td><strong>${r.p.name}</strong><br /><span class="muted">${r.p.delivery}</span></td>
+                  <td>${euro(r.p.newPrice)}</td>
+                  <td>
+                    <input type="number" min="1" value="${r.qty}" data-action="cart-qty" data-id="${r.p.id}" style="width:75px;" />
+                  </td>
+                  <td>${euro(r.subtotal)}</td>
+                  <td>${r.p.installCost ? euro(r.installTotal) : "-"}</td>
+                  <td><button class="danger-btn" data-action="cart-remove" data-id="${r.p.id}">Verwijderen</button></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+        <div class="card summary-card">
+          <p>Producten: <strong>${euro(t.productsTotal)}</strong></p>
+          <p>Installatiekosten: <strong>${euro(t.install)}</strong></p>
+          <p>Verzendkosten: <strong>${t.shipping ? euro(t.shipping) : "Gratis"}</strong></p>
+          <hr />
+          <p>Totaal: <strong>${euro(t.grand)}</strong></p>
+          <p class="help">Gratis bezorging boven EUR 50, anders EUR 6,95.</p>
+          <button class="primary-btn" data-nav="checkout">Naar checkout</button>
+        </div>` : `<div class="card empty-state">Je winkelmand is leeg.</div>`}
+      `);
+    }
+
+    function orderNumber() {
+      return `ORD${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+    }
+
+    function pageCheckout() {
+      const rows = getCartRows();
+      const t = totals();
+      if (!rows.length) return withPage(`<div class="card empty-state">Je winkelmand is leeg. Voeg eerst producten toe.</div>`);
+      return withPage(`
+        <h1>Checkout</h1>
+        <div class="trust-badges">
+          <span>SSL beveiligde checkout</span>
+          <span>Bestel nu, snel geleverd</span>
+          <span>Support binnen 24 uur</span>
+        </div>
+        <div class="checkout-layout">
+          <div class="form-card">
+            <h3>Bestelgegevens</h3>
+            <form id="checkoutForm">
+              <label>Volledige naam<input required name="fullname" /></label>
+              <label>E-mailadres<input required type="email" name="email" /></label>
+              <label>Telefoonnummer / WhatsApp<input required name="phone" /></label>
+              <label>Straat + huisnummer<input required name="address" /></label>
+              <div class="form-grid">
+                <label>Postcode<input required name="postcode" /></label>
+                <label>Woonplaats<input required name="city" /></label>
+              </div>
+              <label>Opmerkingen (optioneel)<textarea name="notes"></textarea></label>
+              <label>Betaalmethode
+                <select required name="payment">
+                  <option value="Tikkie">Tikkie</option>
+                  <option value="Bankoverschrijving">Bankoverschrijving</option>
+                </select>
+              </label>
+              <button class="primary-btn" type="submit">Bestelling plaatsen</button>
+              <p class="help">Door te bestellen ga je akkoord met het retourbeleid en de leveringsvoorwaarden.</p>
+            </form>
+          </div>
+          <div class="form-card summary-card" style="margin-top:0;">
+            <h3>Jouw bestelling</h3>
+            ${rows.map(r => `<p><strong>${r.qty}x</strong> ${r.p.name}<br /><span class="muted">${euro(r.subtotal)} ${r.p.installCost ? `+ ${euro(r.installTotal)} installatie` : ""}</span></p>`).join("")}
+            <hr />
+            <p>Producten: <strong>${euro(t.productsTotal)}</strong></p>
+            <p>Installatie: <strong>${euro(t.install)}</strong></p>
+            <p>Verzending: <strong>${t.shipping ? euro(t.shipping) : "Gratis"}</strong></p>
+            <h3>Totaal: ${euro(t.grand)}</h3>
+          </div>
+        </div>
+      `);
+    }
+
+    function pageConfirm(state) {
+      const order = orders.find(o => o.orderNumber === state.orderNumber);
+      if (!order) return withPage(`<div class="card empty-state">Bestelling niet gevonden.</div>`);
+      const isBank = order.payment === "Bankoverschrijving";
+      const waText = encodeURIComponent(`Hallo CertoDeals, ik heb een vraag over bestelling ${order.orderNumber}.`);
+      return withPage(`
+        <h1>Bestelling bevestigd</h1>
+        <div class="card" style="padding:16px;">
+          <p class="muted">Jouw ordernummer</p>
+          <h2 style="margin-top:0;color:var(--royal-blue);font-size:2rem;">${order.orderNumber}</h2>
+          <p>Bedankt ${order.fullname}, je bestelling is succesvol ontvangen.</p>
+          <h3>Samenvatting</h3>
+          ${order.items.map(i => `<p>${i.qty}x ${i.name} - ${euro(i.price * i.qty)} ${i.install ? `(+ ${euro(i.install * i.qty)} installatie)` : ""}</p>`).join("")}
+          <p><strong>Totaalbedrag: ${euro(order.total)}</strong></p>
+          ${isBank ? `
+            <div class="info-card" style="padding:12px;">
+              <h3>Betaalinstructies (Bankoverschrijving)</h3>
+              <p>IBAN: <strong>${IBAN}</strong></p>
+              <p>Tenaamstelling: <strong>${BANK_NAAM}</strong></p>
+              <p>Bedrag: <strong>${euro(order.total)}</strong></p>
+              <p>Betalingskenmerk: <strong>${order.orderNumber}</strong></p>
+            </div>` :
+            `<div class="info-card" style="padding:12px;">
+              <h3>Tikkie informatie</h3>
+              <p>Binnen 24 uur ontvang je een Tikkie betaalverzoek via WhatsApp op <strong>${order.phone}</strong>.</p>
+            </div>`
+          }
+          <a class="primary-btn" style="display:inline-block;margin-top:12px;text-align:center;" href="https://wa.me/${WHATSAPP_NUMMER}?text=${waText}" target="_blank" rel="noopener">Neem contact op via WhatsApp</a>
+        </div>
+      `);
+    }
+
+    function pageTracking() {
+      return withPage(`
+        <h1>Order tracking</h1>
+        <div class="form-card" style="max-width:520px;">
+          <form id="trackForm">
+            <label>Voer je ordernummer in<input required name="ordernumber" placeholder="Bijv. ORD1714923847512-284" /></label>
+            <button class="primary-btn" type="submit">Controleer status</button>
+          </form>
+          <div id="trackResult" class="help"></div>
+        </div>
+      `);
+    }
+
+    function pageWishlist() {
+      const items = allProducts().filter(p => wishlist.includes(p.id));
+      return withPage(`
+        <h1>Verlanglijst</h1>
+        ${items.length ? `<div class="product-grid">${items.map(productCard).join("")}</div>` : `<div class="card empty-state">Nog geen favorieten toegevoegd.</div>`}
+      `);
+    }
+
+    function pageLogin() {
+      return withPage(`
+        <h1>Inloggen / Registreren</h1>
+        <div class="form-grid">
+          <div class="form-card">
+            <h3>Inloggen</h3>
+            <form id="loginForm">
+              <label>E-mail<input required type="email" name="email"></label>
+              <label>Wachtwoord<input required type="password" name="password"></label>
+              <button class="primary-btn" type="submit">Inloggen</button>
+            </form>
+            <p class="help">Huidige gebruiker: <strong>${activeUser?.email || "Niet ingelogd"}</strong></p>
+          </div>
+          <div class="form-card">
+            <h3>Registreren</h3>
+            <form id="registerForm">
+              <label>Naam<input required name="name"></label>
+              <label>E-mail<input required type="email" name="email"></label>
+              <label>Wachtwoord<input required type="password" name="password"></label>
+              <button class="primary-btn" type="submit">Account aanmaken</button>
+            </form>
+          </div>
+        </div>
+      `);
+    }
+
+    function pageInfo(title, content) {
+      return withPage(`<div class="card" style="padding:18px;"><h1>${title}</h1>${content}</div>`);
+    }
+
+    const staticPages = {
+      about: () => pageInfo("Over ons", `
+        <p>CertoDeals koopt retourpartijen, overstock en B-keuze goederen in bulk in van grote retailers en distributeurs. Hierdoor kunnen wij high-end producten aanbieden tegen aanzienlijk lagere prijzen dan reguliere winkels, terwijl kwaliteit en betrouwbaarheid gewaarborgd blijven.</p>
+        <p>Alle producten worden gecontroleerd op functionaliteit en compleetheid. Zo profiteer jij van premium merken voor een slimme prijs.</p>
+      `),
+      contact: () => pageInfo("Contact", `
+        <p>Vragen over je bestelling? Neem contact op via e-mail of WhatsApp met je ordernummer.</p>
+        <p>E-mail: <strong>support@certodeals.nl</strong><br />WhatsApp: <strong>${WHATSAPP_NUMMER}</strong></p>
+        <p>Wij reageren doorgaans binnen 24 uur op werkdagen.</p>
+      `),
+      returns: () => pageInfo("Retourbeleid", `
+        <ul>
+          <li>Je hebt 14 dagen bedenktijd na ontvangst van je bestelling.</li>
+          <li>Producten moeten ongebruikt en in originele verpakking worden geretourneerd.</li>
+          <li>Retour aanvragen kan via e-mail of WhatsApp met vermelding van ordernummer.</li>
+          <li>Retourkosten zijn voor de klant, behalve bij een defect of fout geleverd product.</li>
+          <li>Terugbetaling vindt plaats binnen 5 werkdagen na ontvangst en controle van de retour.</li>
+        </ul>
+      `),
+      delivery: () => pageInfo("Levertijden & bezorging", `
+        <ul>
+          <li>Standaard levertijd: 1-3 werkdagen.</li>
+          <li>Witgoed en grote apparaten: 3-7 werkdagen inclusief installatie.</li>
+          <li>Fatbikes: 2-5 werkdagen.</li>
+          <li>Gratis bezorging boven EUR 50, daaronder EUR 6,95 verzendkosten.</li>
+          <li>Bezorging via DHL en PostNL.</li>
+        </ul>
+      `),
+      company: () => pageInfo("Bedrijfsinformatie", `
+        <p><strong>CertoDeals B.V.</strong></p>
+        <p>KVK: KVK_PLACEHOLDER<br />BTW: BTW_PLACEHOLDER<br />Adres: ADRES_PLACEHOLDER</p>
+        <p>Voor zakelijke vragen en samenwerkingen kun je contact opnemen via support@certodeals.nl.</p>
+      `),
+      "why-payment": () => pageInfo("Waarom betaalverzoek?", `
+        <p>Om onze prijzen zo laag mogelijk te houden werken wij met Tikkie en bankoverschrijving in plaats van duurdere betaalproviders zoals iDeal en creditcard.</p>
+        <p>Hiermee besparen wij gemiddeld 2-4% transactiekosten per bestelling. Deze besparing rekenen wij direct door aan jou in de vorm van lagere verkoopprijzen.</p>
+      `),
+      privacy: () => pageInfo("Privacybeleid", `
+        <p>Wij verwerken alleen persoonsgegevens die nodig zijn voor orderafhandeling en klantenservice. Gegevens worden niet verkocht aan derden en alleen gedeeld met logistieke partners wanneer nodig voor levering.</p>
+        <p>Voor verzoeken rondom inzage of verwijdering van data kun je contact opnemen via support@certodeals.nl.</p>
+      `)
+    };
+
+    function render(route) {
+      const r = route || { page: "home" };
+      let html = "";
+      if (r.page === "home") html = pageHome();
+      else if (r.page === "category") html = pageCategory(r);
+      else if (r.page === "subcategory") html = pageSubcategory(r);
+      else if (r.page === "listing") html = pageListing(r);
+      else if (r.page === "product") html = pageProduct(r);
+      else if (r.page === "cart") html = pageCart();
+      else if (r.page === "checkout") html = pageCheckout();
+      else if (r.page === "confirm") html = pageConfirm(r);
+      else if (r.page === "tracking") html = pageTracking();
+      else if (r.page === "login") html = pageLogin();
+      else if (r.page === "wishlist") html = pageWishlist();
+      else if (staticPages[r.page]) html = staticPages[r.page]();
+      else html = pageHome();
+      app.innerHTML = html;
+      bindDynamic(r);
+      updateCounters();
+    }
+
+    function bindDynamic(route) {
+      app.querySelectorAll("[data-nav]").forEach(el => {
+        el.addEventListener("click", (e) => {
+          if (el.tagName === "A") e.preventDefault();
+          const page = el.dataset.nav;
+          const next = { page };
+          if (el.dataset.category) next.category = el.dataset.category;
+          if (el.dataset.subcat) next.subcat = el.dataset.subcat;
+          if (el.dataset.brand) next.brand = el.dataset.brand;
+          if (el.dataset.id) next.id = Number(el.dataset.id);
+          if (["category", "subcategory", "listing"].includes(page)) {
+            next.sort = "pop";
+          }
+          navigate(next, true);
+        });
+      });
+
+      app.querySelectorAll("[data-action='add-cart']").forEach(b => b.addEventListener("click", () => addCart(Number(b.dataset.id))));
+      app.querySelectorAll("[data-action='wishlist']").forEach(b => b.addEventListener("click", () => toggleWishlist(Number(b.dataset.id))));
+
+      app.querySelectorAll("[data-action='cart-remove']").forEach(b => b.addEventListener("click", () => {
+        const id = Number(b.dataset.id);
+        cart = cart.filter(x => x.id !== id);
+        saveAll(); render({ page: "cart" });
+      }));
+      app.querySelectorAll("[data-action='cart-qty']").forEach(i => i.addEventListener("change", () => {
+        const id = Number(i.dataset.id);
+        const qty = Math.max(1, Number(i.value || 1));
+        const row = cart.find(x => x.id === id);
+        if (row) row.qty = qty;
+        saveAll(); render({ page: "cart" });
+      }));
+
+      app.querySelectorAll("[data-filter]").forEach(f => f.addEventListener("change", () => {
+        const next = { ...(route || {}) };
+        const key = f.dataset.filter;
+        if (key === "max-price") next.maxPrice = Number(f.value);
+        if (key === "brand") next.brand = f.value || undefined;
+        if (key === "rating") next.rating = Number(f.value || 0);
+        if (key === "sort") next.sort = f.value;
+        navigate(next, true);
+      }));
+      app.querySelectorAll("input[data-filter='max-price']").forEach(f => f.addEventListener("input", () => {
+        const next = { ...(route || {}), maxPrice: Number(f.value) };
+        navigate(next, true);
+      }));
+
+      app.querySelectorAll(".acc-trigger").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const open = btn.getAttribute("aria-expanded") === "true";
+          btn.setAttribute("aria-expanded", open ? "false" : "true");
+        });
+      });
+
+      const reviewForm = document.getElementById("reviewForm");
+      if (reviewForm) {
+        reviewForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const fd = new FormData(reviewForm);
+          const productId = Number(fd.get("productId"));
+          const item = { name: fd.get("name"), rating: Number(fd.get("rating")), text: fd.get("text") };
+          userReviews[productId] = userReviews[productId] || [];
+          userReviews[productId].push(item);
+          saveAll();
+          render({ page: "product", id: productId });
+          showToast("Bedankt! Je review is opgeslagen.", "ok");
+        });
+      }
+
+      const registerForm = document.getElementById("registerForm");
+      if (registerForm) {
+        registerForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const fd = new FormData(registerForm);
+          const email = String(fd.get("email")).toLowerCase();
+          if (users.some(u => u.email === email)) return showToast("Dit e-mailadres bestaat al.", "warn");
+          const user = { name: fd.get("name"), email, password: fd.get("password"), createdAt: Date.now() };
+          users.push(user);
+          activeUser = { name: user.name, email: user.email };
+          saveAll();
+          showToast("Registratie gelukt. Je bent nu ingelogd.", "ok");
+          render({ page: "login" });
+        });
+      }
+
+      const loginForm = document.getElementById("loginForm");
+      if (loginForm) {
+        loginForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const fd = new FormData(loginForm);
+          const email = String(fd.get("email")).toLowerCase();
+          const password = String(fd.get("password"));
+          const match = users.find(u => u.email === email && u.password === password);
+          if (!match) return showToast("Onjuiste inloggegevens.", "bad");
+          activeUser = { name: match.name, email: match.email };
+          saveAll();
+          showToast("Inloggen gelukt.", "ok");
+          render({ page: "home" });
+        });
+      }
+
+      const trackForm = document.getElementById("trackForm");
+      if (trackForm) {
+        trackForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          document.getElementById("trackResult").textContent = "Uw bestelling is in behandeling. Wij nemen zo spoedig mogelijk contact met u op.";
+        });
+      }
+
+      const checkoutForm = document.getElementById("checkoutForm");
+      if (checkoutForm) {
+        checkoutForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const fd = new FormData(checkoutForm);
+          const rowData = getCartRows();
+          const t = totals();
+          const orderNo = orderNumber();
+          const payload = {
+            orderNumber: orderNo,
+            fullname: fd.get("fullname"),
+            email: fd.get("email"),
+            phone: fd.get("phone"),
+            address: fd.get("address"),
+            postcode: fd.get("postcode"),
+            city: fd.get("city"),
+            notes: fd.get("notes"),
+            payment: fd.get("payment"),
+            total: t.grand,
+            items: rowData.map(r => ({ id: r.p.id, name: r.p.name, qty: r.qty, price: r.p.newPrice, install: r.p.installCost }))
+          };
+
+          try {
+            await fetch(FORMSPREE_ENDPOINT, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Accept: "application/json" },
+              body: JSON.stringify(payload)
+            });
+          } catch (err) {
+            console.warn("Formspree verzending mislukt, order gaat lokaal door:", err);
+          }
+
+          orders.unshift({ ...payload, createdAt: Date.now() });
+          cart = [];
+          saveAll();
+          navigate({ page: "confirm", orderNumber: orderNo }, true);
+        });
+      }
+    }
+
+    document.body.addEventListener("click", (e) => {
+      const el = e.target.closest("[data-nav]");
+      if (!el || app.contains(el)) return;
+      if (el.tagName === "A") e.preventDefault();
+      const page = el.dataset.nav;
+      const next = { page };
+      if (el.dataset.category) next.category = el.dataset.category;
+      if (el.dataset.subcat) next.subcat = el.dataset.subcat;
+      if (el.dataset.brand) next.brand = el.dataset.brand;
+      if (el.dataset.id) next.id = Number(el.dataset.id);
+      if (["category", "subcategory", "listing"].includes(page)) {
+        next.sort = "pop";
+      }
+      navigate(next, true);
+    });
+
+    navCategories.addEventListener("click", (e) => {
+      const catEl = e.target.closest("[data-open-category]");
+      if (catEl && !e.target.closest(".dropdown")) {
+        navigate({ page: "category", category: catEl.dataset.openCategory, sort: "pop" }, true);
+      }
+      const sub = e.target.closest("[data-nav='subcategory']");
+      if (sub) {
+        e.preventDefault();
+        navigate({ page: "subcategory", category: sub.dataset.category, subcat: sub.dataset.subcat, sort: "pop" }, true);
+      }
+    });
+
+    document.querySelector("[data-nav='home']").addEventListener("click", () => navigate({ page: "home" }, true));
+    logoutBtn.addEventListener("click", () => {
+      activeUser = null;
+      saveAll();
+      updateCounters();
+      showToast("Je bent uitgelogd.", "ok");
+      navigate({ page: "home" }, true);
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      const q = searchInput.value.trim().toLowerCase();
+      if (!q) return navigate({ page: "home" }, true);
+      navigate({ page: "listing", sort: "pop", query: q, maxPrice: undefined }, true);
+    });
+
+    initNav();
+    updateCounters();
+    const start = history.state || { page: "home" };
+    render(start);
+  </script>
+</body>
+</html>
