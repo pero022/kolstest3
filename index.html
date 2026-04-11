@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
   <title>CertoDeals - High-end deals met grote kortingen</title>
   <style>
     :root {
@@ -22,6 +22,18 @@
     }
 
     * { box-sizing: border-box; }
+    html, body {
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+    #app {
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+    }
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
@@ -32,7 +44,13 @@
     a { color: inherit; text-decoration: none; }
     button { font: inherit; }
 
-    .container { width: min(1240px, 94vw); margin: 0 auto; }
+    .container {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding-left: clamp(12px, 3vw, 20px);
+      padding-right: clamp(12px, 3vw, 20px);
+    }
     .promo-strip {
       background: #0c0d11;
       color: #f4f6ff;
@@ -216,7 +234,13 @@
       border: 1px solid #dce2ef;
       border-top: 0;
     }
-    .nav-item:hover .dropdown { display: block; }
+    @media (hover: hover) and (pointer: fine) {
+      .nav-item:hover .dropdown { display: block; }
+    }
+    @media (hover: none), (pointer: coarse) {
+      .nav-item:hover .dropdown { display: none !important; }
+      .nav-item.nav-touch-open .dropdown { display: block !important; }
+    }
     .dropdown a {
       display: block;
       padding: 12px 14px;
@@ -809,7 +833,26 @@
       .product-detail { grid-template-columns: 1fr; }
       .form-grid { grid-template-columns: 1fr; }
       .checkout-layout { grid-template-columns: 1fr; }
-      th, td { min-width: 120px; }
+      .menu-nav-item .dropdown {
+        min-width: min(360px, calc(100vw - 24px));
+        max-width: calc(100vw - 24px);
+      }
+      .nav-row .container { padding-left: 0; padding-right: 0; }
+      .nav-inner {
+        padding-left: clamp(12px, 3vw, 20px);
+        padding-right: clamp(12px, 3vw, 20px);
+      }
+    }
+    @media (max-width: 720px) {
+      .promo-strip .container {
+        flex-wrap: wrap;
+        justify-content: center;
+        row-gap: 6px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+      }
+      .promo-strip a { white-space: normal; text-align: center; line-height: 1.35; }
+      .nav-inner { -webkit-overflow-scrolling: touch; }
     }
     @media (max-width: 620px) {
       .filters { grid-template-columns: 1fr; }
@@ -963,7 +1006,7 @@
           continue;
         }
         if (inSpecs && line.startsWith("-")) {
-          const rest = line.replace(/^\-\s*/, "");
+          const rest = line.replace(/^-\s*/, "");
           const colon = rest.indexOf(":");
           if (colon !== -1) {
             specs.push({ key: rest.slice(0, colon).trim(), val: rest.slice(colon + 1).trim() });
@@ -976,6 +1019,218 @@
       return { introParas, specs };
     }
     function randFrom(arr, idx) { return arr[idx % arr.length]; }
+
+    const app = document.getElementById("app");
+    const navCategories = document.getElementById("navCategories");
+    const searchInput = document.getElementById("searchInput");
+    const loginBtn = document.querySelector(".login-btn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userChip = document.getElementById("userChip");
+    const toastWrap = document.getElementById("toastWrap");
+
+    const productDisplayName = {
+      "Telefoons|Apple": ["iPhone 15 (128 GB)", "iPhone 15 Pro (256 GB)"],
+      "Telefoons|Samsung": ["Galaxy S24 5G", "Galaxy S24 Ultra"],
+      "Telefoons|Xiaomi": ["Redmi Note 13 Pro", "Xiaomi 14"],
+      "Telefoons|OnePlus": ["OnePlus 12", "OnePlus Nord 3"],
+      "Laptops|Apple": ["MacBook Air 13\" (M3)", "MacBook Pro 14\" (M3 Pro)"],
+      "Laptops|Dell": ["XPS 15 OLED", "Inspiron 16 Plus"],
+      "Laptops|HP": ["Pavilion 15", "Envy x360 15"],
+      "Laptops|Lenovo": ["ThinkPad E14", "IdeaPad Slim 5"],
+      "Tablets|Apple": ["iPad (10e gen)", "iPad Air 11\" (M2)"],
+      "Tablets|Samsung": ["Galaxy Tab S9", "Galaxy Tab A9+"],
+      "Tablets|Lenovo": ["Tab P12", "Tab M10 (3e gen)"],
+      "Televisies|Samsung": ["Crystal UHD 55\" CU7170", "QLED 65\" Q74C"],
+      "Televisies|LG": ["OLED C4 55\"", "NanoCell 65\" NANO81"],
+      "Televisies|Sony": ["Bravia 55\" X80L", "Bravia 65\" XR X90L"],
+      "Audio|Sony": ["WH-1000XM5 (NC)", "SRS-XB100 speaker"],
+      "Audio|JBL": ["Flip 6", "Charge 5"],
+      "Audio|Bose": ["QuietComfort Ultra Earbuds", "SoundLink Flex"],
+      "Audio|Apple": ["AirPods Pro (2e gen)", "AirPods 4 met ANC"],
+      "Gaming|PlayStation": ["PlayStation 5 (disc)", "PlayStation 5 Digital"],
+      "Gaming|Xbox": ["Xbox Series X", "Xbox Series S"],
+      "Gaming|Nintendo": ["Nintendo Switch OLED", "Nintendo Switch Lite"],
+      "Gaming|Logitech": ["PRO X Superlight 2", "G502 X Plus"],
+      "Koffiezetapparaten|Philips": ["LatteGo 5400", "Serie 2200 volautomaat"],
+      "Koffiezetapparaten|DeLonghi": ["Magnifica Evo", "Dinamica Plus"],
+      "Koffiezetapparaten|Krups": ["Essenza Mini Nespresso", "Vertuo Pop"],
+      "Airfryers|Philips": ["7000-serie XXL", "3000-serie"],
+      "Airfryers|Ninja": ["Foodi MAX dual zone", "AF 5,2 L"],
+      "Airfryers|Tefal": ["Easy Fry XXL", "Ultimate Fry Deluxe"],
+      "Blenders & mixers|KitchenAid": ["Artisan blender", "Power Plus 5K"],
+      "Blenders & mixers|Philips": ["Avance HR3658", "ProBlend 6"],
+      "Blenders & mixers|Bosch": ["VitaPower serie 4", "SilentMixx Pro"],
+      "Magnetrons|Samsung": ["MC28 combi ingebouwd", "MS23 solo"],
+      "Magnetrons|Whirlpool": ["CMK combi", "MCP solo 25 L"],
+      "Magnetrons|Panasonic": ["NN-DS combi", "NN-SD inverter"],
+      "Broodroosters & waterkokers|Russell Hobbs": ["Retro 4 sneden", "Textures waterkoker 1,7 L"],
+      "Broodroosters & waterkokers|Smeg": ["TSF01 broodrooster", "KLF04 waterkoker"],
+      "Broodroosters & waterkokers|Philips": ["HD2690 Daily", "HD9350 waterkoker"],
+      "Wasmachines|Bosch": ["WGG244 serie 8", "WAN281 EcoSilence"],
+      "Wasmachines|Samsung": ["WW90T AI Control", "WW11 AddWash"],
+      "Wasmachines|AEG": ["6000 ProSense", "7000 AbsoluteCare"],
+      "Drogers|Bosch": ["WTW875 warmtepomp", "Serie 6 condens"],
+      "Drogers|Miele": ["TEF765 EcoSpeed", "TWG warmtepomp"],
+      "Drogers|AEG": ["8000 AbsoluteCare", "7000 FiberPro"],
+      "Koelkasten|Samsung": ["BMF RB34", "RS6 side-by-side"],
+      "Koelkasten|LG": ["GBB92 inbouw", "GSLV80P US"],
+      "Koelkasten|Beko": ["RCNE koel/vries", "CFG onderbouw"],
+      "Vaatwassers|Bosch": ["SMS6 vrijstaand", "SMV6 volledig integreerbaar"],
+      "Vaatwassers|Siemens": ["SN63 speedMatic", "SN65 iQ500"],
+      "Vaatwassers|Whirlpool": ["WFO 3T123", "WKO vrijstaand"],
+      "Fatbikes elektrisch|Phatfour": ["FLX+ 20\"", "Cruise e-fatbike"],
+      "Fatbikes elektrisch|Engwe": ["M20 fatbike", "X24"],
+      "Fatbikes elektrisch|Ado": ["A20F opvouwbaar", "Beast"],
+      "Fatbikes normaal|Cortina": ["U4 Transport fat", "E-U4 trapondersteuning"],
+      "Fatbikes normaal|Popal": ["Black Fighter 26\"", "Thunder"],
+      "Fatbikes normaal|Brinckers": ["Fat MTB", "Cargo fat"],
+      "Stadsfietsen|Gazelle": ["Paris C7", "Bold"],
+      "Stadsfietsen|Batavus": ["Wayz", "Finez"],
+      "Stadsfietsen|Cortina": ["Roots transport", "Munich"],
+      "Accessoires|ABUS": ["Bordo Lite 6055", "Ultra 410 ketting"],
+      "Accessoires|Kryptonite": ["Evolution Mini-7", "Kryptolok 12 mm"],
+      "Accessoires|Basil": ["Mara XL tas", "Buddy fietsmand"]
+    };
+
+    const subcatRetailBlurb = {
+      Telefoons: "5G, helder scherm en sterke camera — zoals gangbare modellen in de markt.",
+      Laptops: "Krachtige CPU en lange accu; geschikt voor werk en entertainment.",
+      Tablets: "Ideaal voor media en productiviteit; helder paneel.",
+      Televisies: "4K HDR en smartfuncties zoals bij moderne TV’s.",
+      Audio: "Draadloos gemak; rijke klank en NC waar van toepassing.",
+      Gaming: "Consoles en gear met lage latency.",
+      Koffiezetapparaten: "Espresso, melk of cups — vergelijkbaar met elektro-assortiment.",
+      Airfryers: "Minder vet, snelle bereiding; ruime mand of dual zone.",
+      "Blenders & mixers": "Krachtige motor voor smoothies en sauzen.",
+      Magnetrons: "Solo of combi: ontdooien, warm houden, grillen.",
+      "Broodroosters & waterkokers": "Snel kokend water en knapperige toast.",
+      Wasmachines: "Energielabel en trommelinhoud zoals bij bekende series.",
+      Drogers: "Warmtepomp of condens; zacht voor textiel.",
+      Koelkasten: "No-frost en flexibele indeling.",
+      Vaatwassers: "Stille programma’s; ruim inzetbaar.",
+      "Fatbikes elektrisch": "Motorondersteuning en dikke banden.",
+      "Fatbikes normaal": "Robuust frame voor stad en buiten.",
+      Stadsfietsen: "Comfortabel en praktisch voor dagelijks gebruik.",
+      Accessoires: "Sloten en bagage voor op de fiets."
+    };
+
+    const productPhotoPool = {
+      Telefoons: [
+        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1592899677977-99c285394df2?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1616348436168-de43ad0db179?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/IPhone_11_White_Model_back_side.jpg/500px-IPhone_11_White_Model_back_side.jpg"
+      ],
+      Laptops: [
+        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Tablets: [
+        "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b6?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1561154464-82e9adf32764?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1585790050230-5dd28404ccb9?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Televisies: [
+        "https://images.unsplash.com/photo-1593784698575-c78d725bdd8f?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1461157054269-385932e2887d?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Audio: [
+        "https://images.unsplash.com/photo-1505740420920-5e560c06d30e?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Gaming: [
+        "https://images.unsplash.com/photo-1542751371-f48ccf3d8232?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1606144045404-90e5fdd10bd5?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1493711662062-fa541f7f83b3?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Koffiezetapparaten: [
+        "https://images.unsplash.com/photo-1511920170033-f8396922946b?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1495474476917-7d71d9cc9939?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1514066558159-fc8c737ef259?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Airfryers: [
+        "https://images.unsplash.com/photo-1585515320310-259814833e20?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1586202690776-9f3a5a116937?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1556909114-f6e7ad7d44f8?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      "Blenders & mixers": [
+        "https://images.unsplash.com/photo-1570220919058-b581e1efa9e2?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1590794056226-79ef3a8147e3?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Magnetrons: [
+        "https://images.unsplash.com/photo-1584269620568-55b7b2b39d97?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1574269909862-70012b6a417f?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      "Broodroosters & waterkokers": [
+        "https://images.unsplash.com/photo-1520986606214-8b456906c813?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1504754524776-8f4f38690d5a?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Wasmachines: [
+        "https://images.unsplash.com/photo-1626807525986-5be7efe0e3b2?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1584622650111-973aefd01d8b?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Drogers: [
+        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1626807525986-5be7efe0e3b2?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Koelkasten: [
+        "https://images.unsplash.com/photo-1571175443880-3e1d04bb6c6e?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1584568692804-73113d93d1a9?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1556801712-76c8eb07c082?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Vaatwassers: [
+        "https://images.unsplash.com/photo-1585128799890-14ddcedcc0da?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      "Fatbikes elektrisch": [
+        "https://images.unsplash.com/photo-1558618047-3c8c647ca9a0?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1576435728678-68d0c6c40c59?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1507035895480-2b31537c763f?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      "Fatbikes normaal": [
+        "https://images.unsplash.com/photo-1571068316344-75bc76f77890?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1485965120184-e813a9f36f0d?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Stadsfietsen: [
+        "https://images.unsplash.com/photo-1485965120184-e813a9f36f0d?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1502749681289-78b2c50a4638?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1558618047-3c8c647ca9a0?auto=format&fit=crop&w=700&h=500&q=82"
+      ],
+      Accessoires: [
+        "https://images.unsplash.com/photo-1502744688674-c619d1586c9f?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=700&h=500&q=82",
+        "https://images.unsplash.com/photo-1594736797933-d0cbc0a1d553?auto=format&fit=crop&w=700&h=500&q=82"
+      ]
+    };
+
+    const defaultPhotoPool = [
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=700&h=500&q=82",
+      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=700&h=500&q=82"
+    ];
+
+    function productTitle(brand, subcat, i) {
+      const parts = productDisplayName[`${subcat}|${brand}`];
+      if (parts) return `${brand} ${parts[i - 1]}`;
+      return `${brand} ${subcat.replace(" & ", " ")} — variant ${i}`;
+    }
+
+    function productPhotoFor(subcat, bIdx, i) {
+      const pool = productPhotoPool[subcat] || defaultPhotoPool;
+      const idx = (bIdx * 2 + i - 1 + subcat.length) % pool.length;
+      return pool[idx];
+    }
 
     function createProducts() {
       const products = [];
@@ -992,17 +1247,19 @@
               const rating = +(3.6 + ((idCounter * 13) % 14) / 10).toFixed(1);
               const stock = randFrom(stockOptions, idCounter);
               const installCost = category === "Witgoed" ? 49.95 : 0;
-              const name = `${brand} ${subcat.replace(" & ", " ")} ${2022 + (idCounter % 5)} Pro ${i}`;
-              const shortDesc = `High-end ${subcat.toLowerCase()} van ${brand} met premium afwerking en scherpe dealprijs.`;
-              const longDesc = `${name} is zorgvuldig geselecteerd uit overstock en retourpartijen van A-merken.`
+              const name = productTitle(brand, subcat, i);
+              const blurb = subcatRetailBlurb[subcat] || "A-merk kwaliteit, gecontroleerd voor verzending.";
+              const shortDesc = `${name}. ${blurb} Scherpe deal bij CertoDeals.`;
+              const longDesc = `${name} — ${blurb} Geselecteerd uit overstock/retour. Foto representatief (Unsplash/Wikimedia; kleur/uitvoering kan afwijken).`
                 + `\nSpecificaties:`
+                + `\n- Productnaam: ${name}`
                 + `\n- Merk: ${brand}`
                 + `\n- Categorie: ${category} / ${subcat}`
-                + `\n- Conditie: Nieuw of B-keuze (altijd gecontroleerd)`
+                + `\n- Conditie: Nieuw of B-keuze (gecontroleerd)`
                 + `\n- Garantie: 12 maanden`
                 + `\n- Levertijd: ${deliveryBySubcat[subcat] || deliveryBySubcat.default}`
                 + `${installCost ? `\n- Installatiekosten: ${euro(installCost)}` : ""}`;
-              const image = `https://placehold.co/700x500/eaf1ff/1c2e59?text=${encodeURIComponent(brand + " " + subcat)}`;
+              const image = productPhotoFor(subcat, bIdx, i);
               const baseReviews = [0,1,2].map(n => {
                 const p = reviewPool[(idCounter + n) % reviewPool.length];
                 const rv = Math.max(1, Math.min(5, Math.round(rating + (n - 1))));
@@ -1021,7 +1278,12 @@
       });
       return products;
     }
-    const PRODUCTS = createProducts();
+    let PRODUCTS = [];
+    try {
+      PRODUCTS = createProducts();
+    } catch (err) {
+      console.error("CertoDeals: createProducts mislukt", err);
+    }
 
     function allProducts() {
       return [...customProducts, ...PRODUCTS];
@@ -1038,14 +1300,6 @@
     let activeUser = storage.get("cd_active_user", null);
     let orders = storage.get("cd_orders", []);
     let userReviews = storage.get("cd_user_reviews", {});
-
-    const app = document.getElementById("app");
-    const navCategories = document.getElementById("navCategories");
-    const searchInput = document.getElementById("searchInput");
-    const loginBtn = document.querySelector(".login-btn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const userChip = document.getElementById("userChip");
-    const toastWrap = document.getElementById("toastWrap");
 
     function showToast(text, type = "ok") {
       const el = document.createElement("div");
@@ -1880,14 +2134,42 @@
     });
 
     navCategories.addEventListener("click", (e) => {
-      const catEl = e.target.closest("[data-open-category]");
-      if (catEl && !e.target.closest(".dropdown")) {
-        navigate({ page: "category", category: catEl.dataset.openCategory, sort: "pop" }, true);
-      }
+      const coarse = window.matchMedia("(hover: none), (pointer: coarse)").matches;
       const sub = e.target.closest("[data-nav='subcategory']");
       if (sub) {
         e.preventDefault();
+        navCategories.querySelectorAll(".nav-touch-open").forEach(n => n.classList.remove("nav-touch-open"));
         navigate({ page: "subcategory", category: sub.dataset.category, subcat: sub.dataset.subcat, sort: "pop" }, true);
+        return;
+      }
+      const menuAll = e.target.closest(".menu-nav-item");
+      const catEl = e.target.closest("[data-open-category]");
+      if (coarse) {
+        if (menuAll) {
+          if (e.target.closest(".dropdown a")) return;
+          e.preventDefault();
+          menuAll.classList.toggle("nav-touch-open");
+          navCategories.querySelectorAll(".nav-item").forEach(n => {
+            if (n !== menuAll) n.classList.remove("nav-touch-open");
+          });
+          return;
+        }
+        if (catEl && !e.target.closest(".dropdown")) {
+          e.preventDefault();
+          navCategories.querySelectorAll(".nav-touch-open").forEach(n => n.classList.remove("nav-touch-open"));
+          navigate({ page: "category", category: catEl.dataset.openCategory, sort: "pop" }, true);
+          return;
+        }
+        return;
+      }
+      if (catEl && !e.target.closest(".dropdown")) {
+        navigate({ page: "category", category: catEl.dataset.openCategory, sort: "pop" }, true);
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!navCategories.contains(e.target)) {
+        navCategories.querySelectorAll(".nav-touch-open").forEach(n => n.classList.remove("nav-touch-open"));
       }
     });
 
