@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="nl">
-<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CertoDeals - High-end deals met grote kortingen</title>
@@ -22,6 +22,18 @@
     }
 
     * { box-sizing: border-box; }
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+#app {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
@@ -32,7 +44,13 @@
     a { color: inherit; text-decoration: none; }
     button { font: inherit; }
 
-    .container { width: min(1240px, 94vw); margin: 0 auto; }
+    .container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-left: clamp(12px, 3vw, 20px);
+  padding-right: clamp(12px, 3vw, 20px);
+}
     .promo-strip {
       background: #0c0d11;
       color: #f4f6ff;
@@ -809,7 +827,18 @@
       .product-detail { grid-template-columns: 1fr; }
       .form-grid { grid-template-columns: 1fr; }
       .checkout-layout { grid-template-columns: 1fr; }
-      th, td { min-width: 120px; }
+   .menu-nav-item .dropdown {
+  min-width: min(360px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+}
+.nav-row .container {
+  padding-left: 0;
+  padding-right: 0;
+}
+.nav-inner {
+  padding-left: clamp(12px, 3vw, 20px);
+  padding-right: clamp(12px, 3vw, 20px);
+}
     }
     @media (max-width: 620px) {
       .filters { grid-template-columns: 1fr; }
